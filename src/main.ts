@@ -1,14 +1,21 @@
+import { Application } from './Application';
 import { Canvas } from "./canvas";
 import { Texture } from "./texture";
+import { Sprite } from "./Sprite";
 
 const canvas = new Canvas("world", 600, 400);
-const image = new Texture("./assets/cat.jpg");
+const sprite = new Sprite("./assets/neko.png", 32, 32);
 
-const imageLoad = () => {
-  if (image.isLoaded) {
-    canvas.draw(image, 10, 10);
-    return;
+let flick: number = 0;
+let time: number = 1;
+const mainLoop = () => {
+  if (time % 10 == 0) {
+    sprite.setFrameIndex(4 + flick);
+    flick = (flick + 1) % 2;
   }
-  setTimeout(imageLoad, 100);
+  canvas.clear();
+  sprite.draw(canvas, 10, 10);
+  time++;
+  setTimeout(mainLoop, 33);
 }
-setTimeout(imageLoad, 100);
+setTimeout(mainLoop, 33);

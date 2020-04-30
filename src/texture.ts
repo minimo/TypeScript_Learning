@@ -18,7 +18,15 @@ export class Texture {
 
   get isLoaded(): boolean {
     return this._isLoaded;
-  }  
+  }
+
+  get width(): number {
+    return this._img.width;
+  }
+
+  get height(): number {
+    return this._img.height;
+  }
 
 }
 
