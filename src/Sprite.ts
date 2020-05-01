@@ -1,10 +1,10 @@
-import { Canvas } from "./canvas";
-import { Texture } from "./texture";
+import { Canvas } from "./Canvas";
+import { Texture } from "./Texture";
 
 export class Sprite {
   private texture: Texture;
   private _frameIndex: number;
-  private srcRect: {x: number, y: number, width: number, height: number };
+  private srcRect: { x: number, y: number, width: number, height: number };
 
   constructor(public path: string, private _width: number, private _height: number) {
     this._frameIndex = 0;

@@ -1,5 +1,5 @@
-import { Canvas } from "./canvas";
-import { Texture } from "./texture";
+import { Canvas } from "./Canvas";
+import { Texture } from "./Texture";
 
 export class Application {
   private canvas: Canvas;

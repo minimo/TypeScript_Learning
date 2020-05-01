@@ -1,6 +1,5 @@
 import { Application } from './Application';
-import { Canvas } from "./canvas";
-import { Texture } from "./texture";
+import { Canvas } from "./Canvas";
 import { Sprite } from "./Sprite";
 
 const canvas = new Canvas("world", 600, 400);
