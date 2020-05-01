@@ -1,18 +1,25 @@
 import { Canvas } from "./Canvas";
 import { Texture } from "./Texture";
+import { Object2D } from "./Object2D";
 
-export class Sprite {
+export class Sprite extends Object2D {
   private texture: Texture;
   private _frameIndex: number;
   private srcRect: { x: number, y: number, width: number, height: number };
 
-  constructor(public path: string, private _width: number, private _height: number) {
+  constructor(path: string, private _width: number, private _height: number) {
+    super();
+
     this._frameIndex = 0;
     this.texture = new Texture(path);
     this.srcRect = { x: 0, y: 0, width: 0, height: 0 };
   }
 
-  draw(canvas: Canvas, dx: number, dy: number): this {
+  draw(canvas: Canvas): this {
+    return this._draw(canvas, this.x, this.y);
+  }
+
+  _draw(canvas: Canvas, dx: number, dy: number): this {
     if (!this.texture.isLoaded) return this;
     this.setFrameIndex(this._frameIndex);
     const sx = this.srcRect.x;
