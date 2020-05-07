@@ -2,7 +2,7 @@ export class Texture {
   private _img: HTMLImageElement;
   private _isLoaded: boolean;
 
-  constructor(public path: string) {
+  constructor(public path: string = null) {
     this._img = new Image();
     this._img.onload = () => {
       this._isLoaded = true;

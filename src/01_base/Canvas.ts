@@ -42,7 +42,7 @@ export class Canvas {
   }
 
   get context(): CanvasRenderingContext2D {
-    return this.context;
+    return this._context;
   }
 
 }

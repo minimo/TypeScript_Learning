@@ -3,6 +3,7 @@ import { BaseScene } from "./BaseScene";
 import { Keyboard } from "./Keyboard";
 
 export interface UpdateParameter {
+  app: Application,
   canvas: Canvas,
   time: number,
   keyboard: Keyboard,
@@ -33,6 +34,7 @@ export class Application {
       this._canvas?.clear();
       if (this._currentScene) {
         this._currentScene.update({
+          app: this,
           canvas: this._canvas,
           time: this._time,
           keyboard: this._keyboard,

@@ -17,6 +17,7 @@ define("01_base/Texture", ["require", "exports"], function (require, exports) {
     var Texture = /** @class */ (function () {
         function Texture(path) {
             var _this = this;
+            if (path === void 0) { path = null; }
             this.path = path;
             this._img = new Image();
             this._img.onload = function () {
@@ -107,7 +108,7 @@ define("01_base/Canvas", ["require", "exports"], function (require, exports) {
         });
         Object.defineProperty(Canvas.prototype, "context", {
             get: function () {
-                return this.context;
+                return this._context;
             },
             enumerable: true,
             configurable: true
@@ -201,6 +202,7 @@ define("01_base/Application", ["require", "exports", "01_base/Canvas", "01_base/
                 (_a = _this._canvas) === null || _a === void 0 ? void 0 : _a.clear();
                 if (_this._currentScene) {
                     _this._currentScene.update({
+                        app: _this,
                         canvas: _this._canvas,
                         time: _this._time,
                         keyboard: _this._keyboard,
@@ -291,6 +293,81 @@ define("01_base/Sprite", ["require", "exports", "01_base/Texture", "01_base/Obje
     }(Object2D_1.Object2D));
     exports.Sprite = Sprite;
 });
+define("01_base/Label", ["require", "exports", "01_base/Object2D"], function (require, exports, Object2D_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Label = /** @class */ (function (_super) {
+        __extends(Label, _super);
+        function Label(text) {
+            var _this = _super.call(this) || this;
+            _this.text = text;
+            _this._font = "ヒラギノゴシック ProN";
+            _this._fontSize = "14px";
+            _this._fillStyle = "black";
+            _this._textAlign = "center";
+            _this._textBaseline = "middle";
+            _this.x = 0;
+            _this.y = 0;
+            return _this;
+        }
+        Label.prototype.draw = function (canvas) {
+            var context = canvas.context;
+            context.font = this._fontSize + " '" + this._font + "'";
+            context.fillStyle = this._fillStyle;
+            context.textAlign = this._textAlign;
+            context.textBaseline = this._textBaseline;
+            context.fillText(this.text, this.x, this.y);
+            return this;
+        };
+        Label.prototype.setFontSize = function (size) {
+            this.fontSize = size;
+            return this;
+        };
+        Label.prototype.setAlign = function (align) {
+            this.align = align;
+            return this;
+        };
+        Label.prototype.setBaseline = function (baseline) {
+            this.baseline = baseline;
+            return this;
+        };
+        Object.defineProperty(Label.prototype, "fontSize", {
+            set: function (value) {
+                if (typeof value == "string") {
+                    this._fontSize = value;
+                }
+                else {
+                    this._fontSize = value + "px";
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Label.prototype, "fillStyle", {
+            set: function (value) {
+                this._fillStyle = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Label.prototype, "align", {
+            set: function (value) {
+                this._textAlign = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Label.prototype, "baseline", {
+            set: function (value) {
+                this._textBaseline = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return Label;
+    }(Object2D_2.Object2D));
+    exports.Label = Label;
+});
 define("02_components/Player", ["require", "exports", "01_base/Sprite"], function (require, exports, Sprite_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -333,14 +410,29 @@ define("02_components/Player", ["require", "exports", "01_base/Sprite"], functio
             if (this._isJump)
                 return this;
             this._isJump = true;
-            this.vy = -5;
+            this.vy = -7;
             return this;
         };
         return Player;
     }(Sprite_1.Sprite));
     exports.Player = Player;
 });
-define("02_components/GameScene", ["require", "exports", "01_base/BaseScene", "02_components/Player"], function (require, exports, BaseScene_1, Player_1) {
+define("02_components/Block", ["require", "exports", "01_base/Sprite"], function (require, exports, Sprite_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Block = /** @class */ (function (_super) {
+        __extends(Block, _super);
+        function Block() {
+            return _super.call(this, "./assets/block.png", 32, 32) || this;
+        }
+        Block.prototype.update = function (options) {
+            this.x -= 8;
+        };
+        return Block;
+    }(Sprite_2.Sprite));
+    exports.Block = Block;
+});
+define("02_components/GameScene", ["require", "exports", "01_base/BaseScene", "01_base/Label", "02_components/Player", "02_components/Block"], function (require, exports, BaseScene_1, Label_1, Player_1, Block_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var GameScene = /** @class */ (function (_super) {
@@ -348,6 +440,13 @@ define("02_components/GameScene", ["require", "exports", "01_base/BaseScene", "0
         function GameScene() {
             var _this = _super.call(this) || this;
             _this.player = new Player_1.Player().setPosition(100, 200 - 28);
+            _this.score = 0;
+            _this.level = 1;
+            _this.time = 0;
+            _this.blocks = [];
+            _this.scoreLabel = new Label_1.Label("Score:")
+                .setPosition(40, 60)
+                .setAlign("left");
             return _this;
         }
         GameScene.prototype.update = function (options) {
@@ -355,19 +454,71 @@ define("02_components/GameScene", ["require", "exports", "01_base/BaseScene", "0
             if (keyboard.getKeyDown("space")) {
                 this.player.jump();
             }
+            var canvas = options.canvas;
             this.player.update(options);
-            options.canvas.drawLine(0, 200, 640, 200, "black", 2);
+            this.scoreLabel.text = "Score: " + this.score;
+            this.scoreLabel.draw(canvas);
+            canvas.drawLine(0, 200, 640, 200, "black", 2);
+            if (this.time % 2 == 0)
+                this.score++;
+            if (this.time % 60 == 0)
+                this.enterBlock();
+            this.blocks.forEach(function (block) {
+                block.update(options);
+                block.draw(canvas);
+            });
+            this.time++;
+        };
+        GameScene.prototype.enterBlock = function () {
+            var block = new Block_1.Block().setPosition(700, 200 - 32);
+            this.blocks.push(block);
         };
         return GameScene;
     }(BaseScene_1.BaseScene));
     exports.GameScene = GameScene;
 });
-define("main", ["require", "exports", "01_base/Application", "02_components/GameScene"], function (require, exports, Application_1, GameScene_1) {
+define("02_components/TitleScene", ["require", "exports", "01_base/BaseScene", "02_components/GameScene", "01_base/Sprite", "01_base/Label"], function (require, exports, BaseScene_2, GameScene_1, Sprite_3, Label_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var TitleScene = /** @class */ (function (_super) {
+        __extends(TitleScene, _super);
+        function TitleScene() {
+            var _this = _super.call(this) || this;
+            _this.isExit = false;
+            _this.titleImage = new Sprite_3.Sprite("./assets/cat.jpg", 300, 200)
+                .setPosition(320 - 150, 100);
+            _this.titleText1 = new Label_2.Label("Straycat over run!")
+                .setPosition(320, 80)
+                .setFontSize(30);
+            _this.titleText2 = new Label_2.Label("PRESS SPACE KEY")
+                .setPosition(320, 320)
+                .setFontSize(20);
+            return _this;
+        }
+        TitleScene.prototype.update = function (options) {
+            var canvas = options.canvas;
+            this.titleImage.draw(canvas);
+            this.titleText1.draw(canvas);
+            this.titleText2.draw(canvas);
+            if (this.isExit)
+                return;
+            var keyboard = options.keyboard;
+            if (keyboard.getKeyDown("space")) {
+                var gameScene = new GameScene_1.GameScene();
+                options.app.setScene(gameScene);
+                this.isExit = true;
+            }
+        };
+        return TitleScene;
+    }(BaseScene_2.BaseScene));
+    exports.TitleScene = TitleScene;
+});
+define("main", ["require", "exports", "01_base/Application", "02_components/TitleScene"], function (require, exports, Application_1, TitleScene_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var app = new Application_1.Application("world", 600, 400);
-    var gameScene = new GameScene_1.GameScene();
-    app.setScene(gameScene);
+    var titleScene = new TitleScene_1.TitleScene();
+    app.setScene(titleScene);
     app.run();
 });
 //# sourceMappingURL=bundle.js.map

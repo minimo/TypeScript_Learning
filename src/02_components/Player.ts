@@ -48,7 +48,7 @@ export class Player extends Sprite {
     if (this._isJump) return this;
 
     this._isJump = true;
-    this.vy = -5;
+    this.vy = -7;
 
     return this;
   }
