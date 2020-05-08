@@ -3,7 +3,7 @@ interface KeyCode {
 }
 
 export class Keyboard {
-  private KEYLIST: boolean[];
+  protected KEYLIST: boolean[];
 
   constructor() {
     this.KEYLIST = [];

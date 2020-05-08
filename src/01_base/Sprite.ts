@@ -3,12 +3,12 @@ import { Texture } from "./Texture";
 import { Object2D } from "./Object2D";
 
 export class Sprite extends Object2D {
-  private texture: Texture;
-  private _frameIndex: number;
-  private srcRect: { x: number, y: number, width: number, height: number };
+  protected texture: Texture;
+  protected _frameIndex: number;
+  protected srcRect: { x: number, y: number, width: number, height: number };
 
-  constructor(path: string, private _width: number, private _height: number) {
-    super();
+  constructor(path: string, width: number, height: number) {
+    super(width, height);
 
     this._frameIndex = 0;
     this.texture = new Texture(path);
@@ -33,8 +33,8 @@ export class Sprite extends Object2D {
   setFrameIndex(index: number): this {
     const image = this.texture.image;
 
-    const tw = this._width;
-    const th = this._height;
+    const tw = this.width;
+    const th = this.height;
 
     const row = ~~(image.width / tw);
     const col = ~~(image.height / th);

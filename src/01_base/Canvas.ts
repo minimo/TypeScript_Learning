@@ -1,8 +1,8 @@
 import { Texture } from "./Texture";
 
 export class Canvas {
-  private domElement: HTMLCanvasElement;
-  private _context: CanvasRenderingContext2D | null;
+  protected domElement: HTMLCanvasElement;
+  protected _context: CanvasRenderingContext2D | null;
 
   constructor(query: string, public width: number = 100, public height: number = 100) {
     if (query != "") {

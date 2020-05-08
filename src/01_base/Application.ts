@@ -10,11 +10,11 @@ export interface UpdateParameter {
 }
 
 export class Application {
-  private _canvas: Canvas;
-  private _isRunning: boolean;
-  private _currentScene: BaseScene;
-  private _time: number;
-  private _keyboard: Keyboard;
+  protected _canvas: Canvas;
+  protected _isRunning: boolean;
+  protected _currentScene: BaseScene;
+  protected _time: number;
+  protected _keyboard: Keyboard;
 
   constructor(query: string, public width: number = 640, public height: number = 480) {
     this._isRunning = false;

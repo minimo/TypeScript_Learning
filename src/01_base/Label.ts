@@ -6,11 +6,11 @@ export class Label extends Object2D {
   public x: number;
   public y: number;
 
-  private _font: string;
-  private _fontSize: string;
-  private _fillStyle: string;
-  private _textAlign: CanvasTextAlign;
-  private _textBaseline: CanvasTextBaseline;
+  protected _font: string;
+  protected _fontSize: string;
+  protected _fillStyle: string;
+  protected _textAlign: CanvasTextAlign;
+  protected _textBaseline: CanvasTextBaseline;
 
   constructor(public text: string) {
     super();

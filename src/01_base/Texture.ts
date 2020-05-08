@@ -1,15 +1,30 @@
 export class Texture {
-  private _img: HTMLImageElement;
-  private _isLoaded: boolean;
+  protected _path: string;
+  protected _img: HTMLImageElement;
+  protected _isLoaded: boolean;
 
-  constructor(public path: string = null) {
-    this._img = new Image();
-    this._img.onload = () => {
-      this._isLoaded = true;
+  protected loadedCallback: { (texture: Texture): void };
+
+  constructor(path: string = null) {
+    this._path = path;
+    if (this._path) {
+      this.load(path);
+    } else {
+      this._img = null;
     }
-    this._img.src = path;
-
     this._isLoaded = false;
+  }
+
+  load(path: string): Promise<any> {
+    return new Promise(resolve => {
+      this._img = new Image();
+      this._img.onload = () => {
+        this._isLoaded = true;
+        resolve();
+      }
+      this._img.src = path;
+      this._path = path;
+    });
   }
 
   get image(): HTMLImageElement {
