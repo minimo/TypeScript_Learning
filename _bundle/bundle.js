@@ -396,103 +396,6 @@ define("02_components/Block", ["require", "exports", "02_components/BaseObject"]
     }
     exports.Block = Block;
 });
-define("02_components/GameScene", ["require", "exports", "01_base/BaseScene", "01_base/Label", "02_components/Player", "02_components/Block"], function (require, exports, BaseScene_1, Label_1, Player_1, Block_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    class GameScene extends BaseScene_1.BaseScene {
-        constructor() {
-            super();
-            this.player = new Player_1.Player().setPosition(100, 200 - 28);
-            this.score = 0;
-            this.level = 1;
-            this.time = 0;
-            this.isGameover = false;
-            this.blocks = [];
-            this.scoreLabel = new Label_1.Label("Score:")
-                .setPosition(40, 60)
-                .setAlign("left");
-            this.gameoverLabel = new Label_1.Label("GAME OVER")
-                .setPosition(320, 150)
-                .setFontSize(30);
-        }
-        update(options) {
-            const keyboard = options.keyboard;
-            if (keyboard.getKeyDown("space")) {
-                this.player.jump();
-            }
-            const canvas = options.canvas;
-            canvas.drawLine(0, 200, 640, 200, "black", 2);
-            this.scoreLabel.text = `Score: ${this.score}`;
-            this.scoreLabel.draw(canvas);
-            if (!this.isGameover) {
-                if (this.time % 2 == 0)
-                    this.score++;
-                if (this.time % 60 == 0)
-                    this.enterBlock();
-                this.player.update(options);
-            }
-            else {
-                this.gameoverLabel.draw(canvas);
-            }
-            this.player.draw(canvas);
-            this.blocks.forEach(block => {
-                if (!this.isGameover)
-                    block.update(options);
-                block.draw(canvas);
-                if (this.player.hitTest(block))
-                    this.isGameover = true;
-            });
-            this.blocks = this.blocks.filter(block => !block.isDelete);
-            this.time++;
-        }
-        enterBlock() {
-            const block = new Block_1.Block().setPosition(700, 200 - 32);
-            this.blocks.push(block);
-        }
-    }
-    exports.GameScene = GameScene;
-});
-define("02_components/TitleScene", ["require", "exports", "01_base/BaseScene", "02_components/GameScene", "01_base/Sprite", "01_base/Label"], function (require, exports, BaseScene_2, GameScene_1, Sprite_3, Label_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    class TitleScene extends BaseScene_2.BaseScene {
-        constructor() {
-            super();
-            this.isExit = false;
-            this.titleImage = new Sprite_3.Sprite("./assets/cat.jpg", 300, 200)
-                .setPosition(320 - 150, 100);
-            this.titleText1 = new Label_2.Label("Straycat over run!")
-                .setPosition(320, 80)
-                .setFontSize(30);
-            this.titleText2 = new Label_2.Label("PRESS SPACE KEY")
-                .setPosition(320, 320)
-                .setFontSize(20);
-        }
-        update(options) {
-            const canvas = options.canvas;
-            this.titleImage.draw(canvas);
-            this.titleText1.draw(canvas);
-            this.titleText2.draw(canvas);
-            if (this.isExit)
-                return;
-            const keyboard = options.keyboard;
-            if (keyboard.getKeyDown("space")) {
-                const gameScene = new GameScene_1.GameScene();
-                options.app.setScene(gameScene);
-                this.isExit = true;
-            }
-        }
-    }
-    exports.TitleScene = TitleScene;
-});
-define("main", ["require", "exports", "01_base/Application", "02_components/TitleScene"], function (require, exports, Application_1, TitleScene_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    const app = new Application_1.Application("world", 600, 400);
-    const titleScene = new TitleScene_1.TitleScene();
-    app.setScene(titleScene);
-    app.run();
-});
 define("02_components/Apple", ["require", "exports", "02_components/BaseObject"], function (require, exports, BaseObject_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -504,5 +407,137 @@ define("02_components/Apple", ["require", "exports", "02_components/BaseObject"]
         }
     }
     exports.Apple = Apple;
+});
+define("02_components/TitleScene", ["require", "exports", "01_base/BaseScene", "02_components/GameScene", "01_base/Sprite", "01_base/Label"], function (require, exports, BaseScene_1, GameScene_1, Sprite_3, Label_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class TitleScene extends BaseScene_1.BaseScene {
+        constructor() {
+            super();
+            this.isExit = false;
+            this.isBefore = true;
+            this.time = 0;
+            this.titleImage = new Sprite_3.Sprite("./assets/cat.jpg", 300, 200)
+                .setPosition(320 - 150, 100);
+            this.titleText1 = new Label_1.Label("Straycat over run!")
+                .setPosition(320, 80)
+                .setFontSize(30);
+            this.titleText2 = new Label_1.Label("PRESS SPACE KEY")
+                .setPosition(320, 320)
+                .setFontSize(20);
+        }
+        update(options) {
+            const canvas = options.canvas;
+            this.titleImage.draw(canvas);
+            this.titleText1.draw(canvas);
+            this.titleText2.draw(canvas);
+            if (this.isExit)
+                return;
+            const keyboard = options.keyboard;
+            if (keyboard.getKeyDown("space") && this.time > 30) {
+                const gameScene = new GameScene_1.GameScene();
+                options.app.setScene(gameScene);
+                this.isExit = true;
+                this.isBefore = true;
+            }
+            this.time++;
+        }
+    }
+    exports.TitleScene = TitleScene;
+});
+define("02_components/GameScene", ["require", "exports", "01_base/BaseScene", "01_base/Label", "02_components/Player", "02_components/Block", "02_components/Apple", "02_components/TitleScene"], function (require, exports, BaseScene_2, Label_2, Player_1, Block_1, Apple_1, TitleScene_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class GameScene extends BaseScene_2.BaseScene {
+        constructor() {
+            super();
+            this.player = new Player_1.Player().setPosition(100, 200 - 28);
+            this.score = 0;
+            this.level = 1;
+            this.time = 0;
+            this.isGameover = false;
+            this.isExit = false;
+            this.blocks = [];
+            this.scoreLabel = new Label_2.Label("Score:")
+                .setPosition(40, 60)
+                .setAlign("left");
+            this.gameoverLabel1 = new Label_2.Label("GAME OVER")
+                .setPosition(320, 150)
+                .setFontSize(30);
+            this.gameoverLabel2 = new Label_2.Label("")
+                .setPosition(320, 180)
+                .setFontSize(20);
+            this.gameoverLabel3 = new Label_2.Label("PRESS SPACE KEY")
+                .setPosition(320, 250)
+                .setFontSize(20);
+        }
+        update(options) {
+            const keyboard = options.keyboard;
+            if (keyboard.getKeyDown("space")) {
+                this.player.jump();
+            }
+            const canvas = options.canvas;
+            canvas.drawLine(0, 200, 640, 200, "black", 2);
+            this.scoreLabel.text = `Score: ${this.score}`;
+            this.scoreLabel.draw(canvas);
+            if (!this.isGameover) {
+                if (this.time % 5 == 0)
+                    this.score++;
+                if (this.time % 60 == 0)
+                    this.enterBlock();
+                if (this.time % 50 == 0)
+                    this.enterApple();
+                this.player.update(options);
+            }
+            this.player.draw(canvas);
+            this.blocks.forEach(block => {
+                if (!this.isGameover)
+                    block.update(options);
+                block.draw(canvas);
+                if (this.player.hitTest(block) && !this.isGameover) {
+                    if (block instanceof Block_1.Block) {
+                        this.isGameover = true;
+                        this.gameoverLabel2.text = `SCORE: ${this.score}`;
+                        this.time = 0;
+                    }
+                    if (block instanceof Apple_1.Apple) {
+                        block.isDelete = true;
+                        this.score += 10;
+                    }
+                }
+            });
+            this.blocks = this.blocks.filter(block => !block.isDelete);
+            if (this.isGameover) {
+                this.gameoverLabel1.draw(canvas);
+                this.gameoverLabel2.draw(canvas);
+                this.gameoverLabel3.draw(canvas);
+                if (this.time > 30) {
+                    const keyboard = options.keyboard;
+                    if (keyboard.getKeyDown("space") && !this.isExit) {
+                        options.app.setScene(new TitleScene_1.TitleScene());
+                        this.isExit = true;
+                    }
+                }
+            }
+            this.time++;
+        }
+        enterBlock() {
+            const block = new Block_1.Block().setPosition(700, 200 - 32);
+            this.blocks.push(block);
+        }
+        enterApple() {
+            const apple = new Apple_1.Apple().setPosition(700, 120);
+            this.blocks.push(apple);
+        }
+    }
+    exports.GameScene = GameScene;
+});
+define("main", ["require", "exports", "01_base/Application", "02_components/TitleScene"], function (require, exports, Application_1, TitleScene_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    const app = new Application_1.Application("world", 600, 400);
+    const titleScene = new TitleScene_2.TitleScene();
+    app.setScene(titleScene);
+    app.run();
 });
 //# sourceMappingURL=bundle.js.map

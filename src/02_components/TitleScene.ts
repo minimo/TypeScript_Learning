@@ -6,14 +6,20 @@ import { Label } from "../01_base/Label";
 
 export class TitleScene extends BaseScene {
 
+  isBefore: boolean;
   isExit: boolean;
   titleImage: Sprite;
   titleText1: Label;
   titleText2: Label;
 
+  time: number;
+
   constructor() {
     super();
     this.isExit = false;
+    this.isBefore = true;
+    this.time = 0;
+
     this.titleImage = new Sprite("./assets/cat.jpg", 300, 200)
       .setPosition(320 - 150, 100);
 
@@ -35,11 +41,14 @@ export class TitleScene extends BaseScene {
     if (this.isExit) return;
 
     const keyboard = options.keyboard;
-    if (keyboard.getKeyDown("space")) {
+    if (keyboard.getKeyDown("space") && this.time > 30) {
       const gameScene = new GameScene();
       options.app.setScene(gameScene);
       this.isExit = true;
+      this.isBefore = true;
     }
+
+    this.time++;
   }
 }
 

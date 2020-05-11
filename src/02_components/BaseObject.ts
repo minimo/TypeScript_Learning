@@ -13,7 +13,7 @@ export abstract class BaseObject extends Sprite {
   update(options: UpdateParameter) {
     this.x -= 8;
     if (this.x < -32) this.isDelete = true;
-    this.algorithm(options)
+    this.algorithm(options);
   }
 
   abstract algorithm(options: UpdateParameter): void;
